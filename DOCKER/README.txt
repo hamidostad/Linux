@@ -3,3 +3,6 @@ docker build -t apache_cmd -f <name> <Dockerfile path>
 
 # run container:
 docker run -d --name <container name> -p <port host:port container> <image name>
+
+#for enter to container
+docker exec -it <container name> /bin/bash/
