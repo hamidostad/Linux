@@ -5,6 +5,9 @@ config ssh
 check ansible.cfp
 create inventory
 
+# Ad-hoc command syntax
+ansible <hosts> -m command -a "<command>"
+
 # sample yml file for ansible-playbook
 ---
 - name: DEPLOY HTTPD
