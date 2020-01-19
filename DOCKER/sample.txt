@@ -1,0 +1,19 @@
+# Dockerfile for install httpd include ARG, WORKDIR, ADD & USER
+
+FROM centos:latest
+
+ARG user=hamid
+
+RUN yum install -y httpd unzip
+
+WORKDIR /var/www/html
+
+ADD https://github.com/mdn/beginner-html-site-styled/archive/gh-pages.zip code.zip
+
+RUN useradd $user && chown $user:$user ../../ -R && unzip code.zip && mv beginner-html-site-styled-gh-pages/* .
+
+USER $user && rm code.zip
+
+USER root
+
+CMD apachectl -DFOREGROUND
