@@ -1,3 +1,5 @@
+http://kb.cloudblue.com/en/132920
+
 ##Kubernetes installation Centos
 1.
 yum -y update
