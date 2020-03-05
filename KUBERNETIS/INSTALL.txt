@@ -1,42 +1,100 @@
-http://kb.cloudblue.com/en/132920
+## set namesever Shecan:
+nameserver 178.22.122.100
 
-##Kubernetes installation Centos
-1.
-yum -y update
+## change attrib for /etc/resolve to permanent this file:
+chattr +i /etc/resolv.conf
+#and add PEERDNS=no to main network interface card config file:
+#example:
+TYPE="Ethernet"
+PROXY_METHOD="none"
+BROWSER_ONLY="no"
+BOOTPROTO="dhcp"
+PEERDNS=no
+DEFROUTE="yes"
+IPV4_FAILURE_FATAL="no"
+IPV6INIT="yes"
+IPV6_AUTOCONF="yes"
+IPV6_DEFROUTE="yes"
+IPV6_FAILURE_FATAL="no"
+IPV6_ADDR_GEN_MODE="stable-privacy"
+NAME="ens33"
+UUID="6f963b47-8823-45f9-af19-d488ee2aaf1d"
+DEVICE="ens33"
+ONBOOT="yes"
 
-#if there were issue on downloading packages:
+##change hostname
+vim /etc/hostname
+master
+
+##change hosts file:
+vim /etc/hosts
+10.10.10.100 master
+10.10.10.101 node1
+
+##set IP address for second NIC:
+vim /etc/sysconfig/network-scripts/ifcfg-ens37
+DEVICE="ens37"
+HWADDR="00:0c:29:b3:3d:8d"
+NM_CONTROLLED="no"
+ONBOOT="yes"
+BOOTPROTO="static"
+IPADDR=10.10.10.100
+NETMASK=255.255.255.0
+
+##set selinux to disabled:
+setenforce 0
+sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
+
+#master:
+sudo firewall-cmd --permanent --add-port=6443/tcp
+sudo firewall-cmd --permanent --add-port=2379-2380/tcp
+sudo firewall-cmd --permanent --add-port=10250/tcp
+sudo firewall-cmd --permanent --add-port=10251/tcp
+sudo firewall-cmd --permanent --add-port=10252/tcp
+sudo firewall-cmd --permanent --add-port=10255/tcp
+sudo firewall-cmd --reload
+
+#worker:
+sudo firewall-cmd --permanent --add-port=10250/tcp
+sudo firewall-cmd --permanent --add-port=10251/tcp
+sudo firewall-cmd --permanent --add-port=10255/tcp
+sudo firewall-cmd --permanent --add-port=6783/tcp
+sudo firewall-cmd --permanent --add-port=30000-32767/tcp
+firewall-cmd --reload
+
+## swap off:
+swapoff -a
+vim /etc/fstab
+
+##disable ipv6 (optionally):
+vi /etc/sysctl.d/70-ipv6.conf
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+
+sysctl --load /etc/sysctl.d/70-ipv6.conf
+
+##restart the server
+init 6
+
+## updates packages
 yum --enablerepo=updates clean metadata
 yum clean all
 yum clean dbcache
-yum -y update
-yum install -y curl wget net-tools bind-utils elinks
-yum -y update
-yum upgrade
+yum update
+yum install curl wget net-tools bind-utils elinks
+yum update
 
-___________________________________________________________
+##installing docker:
+yum install yum-utils device-mapper-persistent-data lvm2
+yum-config-manager --add-repo   https://download.docker.com/linux/centos/docker-ce.repo
+yum update
 
-swapoff -a
-vi /etc/fstab
-init 6
-___________________________________________________________
+## if we face to error:
+sysctl -w net.ipv4.ip_no_pmtu_disc=1
 
-2. installing Docker and required packages:
+yum install   containerd.io-1.2.10   docker-ce-19.03.4   docker-ce-cli-19.03.4
 
-sudo yum install -y yum-utils \
-  device-mapper-persistent-data \
-  lvm2
-sudo yum-config-manager \
-    --add-repo \
-    https://download.docker.com/linux/centos/docker-ce.repo
-
-sudo yum install -y docker-ce docker-ce-cli containerd.io
-
-yum update -y
-
-## Create /etc/docker directory.
 mkdir /etc/docker
-
-# Setup daemon.
 cat > /etc/docker/daemon.json <<EOF
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
@@ -52,83 +110,11 @@ cat > /etc/docker/daemon.json <<EOF
 EOF
 
 mkdir -p /etc/systemd/system/docker.service.d
-
-# Restart Docker
 systemctl daemon-reload
 systemctl restart docker
-systemctl enable docker
-___________________________________________________________
+docker info
 
-3. Configure Firewall
-#master:
-sudo firewall-cmd --permanent --add-port=6443/tcp
-sudo firewall-cmd --permanent --add-port=2379-2380/tcp
-sudo firewall-cmd --permanent --add-port=10250/tcp
-sudo firewall-cmd --permanent --add-port=10251/tcp
-sudo firewall-cmd --permanent --add-port=10252/tcp
-sudo firewall-cmd --permanent --add-port=10255/tcp
-sudo firewall-cmd --reload
-
-
-#worker:
-sudo firewall-cmd --permanent --add-port=10250/tcp
-sudo firewall-cmd --permanent --add-port=10251/tcp
-sudo firewall-cmd --permanent --add-port=10255/tcp
-sudo firewall-cmd --permanent --add-port=6783/tcp
-sudo firewall-cmd --permanent --add-port=30000-32767/tcp
-firewall-cmd --reload
-
-___________________________________________________________
-
-4. set hosts file (on all master and nodes)
-vi /etc/hosts
-
-10.10.10.100 kubemaster
-10.10.10.101 kubenode1
-10.10.10.102 kubenode2
-
-##set hostname
-vi /etc/hostname
-
-___________________________________________________________
-
-##set static ip 
-vi /etc/sysconfig/network-scripts/ifcfg-ens37
-DEVICE="ens37"
-HWADDR="00:0c:29:39:a5:55"
-NM_CONTROLLED="no"
-ONBOOT="yes"
-BOOTPROTO="static"
-IPADDR=10.10.10.101
-NETMASK=255.255.255.0
-
-
-___________________________________________________________
-
-5.disable SElinux:
-# Set SELinux in permissive mode (effectively disabling it)
-setenforce 0
-sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
-
-___________________________________________________________
-
-6. iptables config;
-
-modprobe br_netfilter
-
-cat <<EOF > /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-EOF
-sysctl --system
-___________________________________________________________
-
-
-***********init 6******************
-
-___________________________________________________________
-
-7. Installing kubelet kubectl kubeadm:
+##installing kubernetes:
 
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
@@ -140,56 +126,52 @@ repo_gpgcheck=1
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
 
-yum update -y
-
-yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
-
-yum update -y
-
+yum install kubelet kubeadm kubectl --disableexcludes=kubernetes
 systemctl enable --now kubelet
-systemctl enable docker
-systemctl enable kubelet
-systemctl status kubelet
 
-___________________________________________________________
+## exclude docker and kubernetes from updating:
+vim /etc/yum.conf
+exclude=docker-ce docker-ce-stable docker-ce-cli containerd.io kubelet kubeadm kubectl
 
-8.
-kubeadm config images pull
+##
+modprobe br_netfilter
 
-kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=10.10.10.100
+cat <<EOF > /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
 
-___________________________________________________________
+sysctl --system
 
-9.
-root user:
-export KUBECONFIG=/etc/kubernetes/admin.conf
+## DO ALL STEPS MENTIONED ABOVE ON ALL MASTER AND NODES SINCE THEY ARE SAME.
 
-To make kubectl work for your non-root user, run these commands, which are also part of the kubeadm init output:
+##master
+wget https://docs.projectcalico.org/v3.11/manifests/calico.yaml
+vim calico.yaml
+
+# Auto-detect the BGP IP address.
+- name: IP
+value: "autodetect"
+- name: IP_AUTODETECTION_METHOD
+value: "interface=ens37"
+
+- name: CALICO_IPV4POOL_CIDR
+value: "192.168.100.0/24"
+
+##init the kubeadm:
+kubeadm init --pod-network-cidr=192.168.100.0/24 --apiserver-advertise-address=10.10.10.100
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
+export KUBECONFIG=/etc/kubernetes/admin.conf
 
-___________________________________________________________
 
-10.
-copy the join command and keep it:
-kubeadm join 10.10.10.100:6443 --token 31q14b.jvv4p8qgd8evm4j5 \
-    --discovery-token-ca-cert-hash sha256:75eae59405c081d6f598aaae4ae06204e15c7715b258e41f419297ac851ab4e5
-___________________________________________________________
+kubectl apply -f calico.yaml
 
-11.
-on master before joining worker:
-kubectl apply -f https://docs.projectcalico.org/v3.11/manifests/calico.yaml
+## join other nodes to cluster:
+kubeadm join 10.10.10.100:6443 --token 2mvxad.g007mtyzo7dm9ozo \
+    --discovery-token-ca-cert-hash sha256:0b8b8c42f71aac17f4cb3f958a33fb20acca168c3f11ef95fce90b8c659b8462
 
-___________________________________________________________
-
-12.
+kubectl get nodes
 kubectl get pods --all-namespaces
-make sure all status is running
-___________________________________________________________
-
-13.
-paste the join command on workers
-kubeadm join 10.10.10.100:6443 --token 31q14b.jvv4p8qgd8evm4j5 \
-    --discovery-token-ca-cert-hash sha256:75eae59405c081d6f598aaae4ae06204e15c7715b258e41f419297ac851ab4e5
