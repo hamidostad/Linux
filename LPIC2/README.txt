@@ -1152,8 +1152,12 @@ sudo ntpdate server 0.ir.pool.ntp.org
 Finally, run the commands below to change the hardware clock.
 sudo hwclock --systohc
 
-
+################## IPTABLES #####################
+##tables:  1.filter   2.nat   3.mangle
+##filter:  2.INPUT    3.OUTPUT   3.FORWARD
 ##Packet filtering
+service iptables save
+systemctl save iptables
 iptables -L
 iptables -L | grep FORWARD
 iptables -P FORWARD DROP
