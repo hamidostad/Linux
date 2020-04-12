@@ -1156,16 +1156,35 @@ sudo hwclock --systohc
 ##tables:  1.filter   2.nat   3.mangle
 ##chain:  2.INPUT    3.OUTPUT   3.FORWARD
 ##Packet filtering
+/etc/init.d/iptables save
 service iptables save
 systemctl save iptables
-iptables -L
+iptables -L              
 iptables -L | grep FORWARD
 iptables -P FORWARD DROP
 iptables  --flush
 iptables -A INPUT --protocol icmp --in-interface enp0s3 -j DROP
 iptables -A INPUT --protocol icmp --in-interface enp0s3 -j REJECT
+iptables -F       #### iptables --flush : this command just flush roles
 
-#iptables
+## open incoming ssh on iptables
+iptables -A INPUT -i eth0 -p tcp --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT   ## "state" for state of connections
+iptables -A OUTPUT -o eth0 -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT   
+
+## allow ping from outside to inside
+iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+iptables -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
+
+## allow ping from inside to outside
+iptables -A INPUT -p icmp --icmp-type echo-reply -j ACCEPT
+iptables -A OUTPUT -p icmp --icmp-type echo-request -j ACCEPT
+
+## replace rule
+iptables -R INPUT 3 -i eth0 -p tcp --dport 22 -m state state --state NEW,ESTABLISHED -j ACCEPT
+
+## delete rule
+iptables -D INPUT 3
+
 iptables -nvl
 iptables -nvl -t nat
 iptables -A INPUT -s 192.168.12.133 -j DROP
@@ -1184,21 +1203,21 @@ vim /etc/iptables/rules.v4
 /etc/init.d/iptables-persistent reload
 iptables -L
 
-##Firewall settings
+########### Firewall settings ################
 systemctl status firewalld
 vim /etc/sysconfig/iptables-config
 iptables -A INPUT -p tcp -s 0/0 --sport 1024:65535 -d 0/0 --dport 80 -j REJECT
 iptables -A OUTPUT -p tcp --dport 80 --sport 1024:65535 -j REJECT
 iptables-restore < /etc/sysconfig/iptables
 
-##ss
+###### ss ########
 utility to investigate sockets
 ss -t -a >> all tcp sockets that are opened
 ss -t -o
 ss -tn sport = :80
 
 
-##nmap
+######### nmap #######
 yum install nmap
 nmap
 nmap -A localhost
