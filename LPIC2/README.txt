@@ -1154,7 +1154,7 @@ sudo hwclock --systohc
 
 ################## IPTABLES #####################
 ##tables:  1.filter   2.nat   3.mangle
-##filter:  2.INPUT    3.OUTPUT   3.FORWARD
+##chain:  2.INPUT    3.OUTPUT   3.FORWARD
 ##Packet filtering
 service iptables save
 systemctl save iptables
@@ -1501,6 +1501,9 @@ scp -r folder username@ip:/home/username
 
 scp username@ip:/home/username/filename.txt /home/kavian/Desktop
 
+################# FTP ################
+## vsftpd
+anon_max_rate=10000   ## limit rate for transfer files
 ##SFTP
 cd /etc/ssh
 vim sshd_config
