@@ -170,9 +170,9 @@ ansible <hosts> -m command -a "<command>"
     - file4
   tags: [create_files]
   
-  ### create users and groups and iid with multi variable ##
-  - name: create g1 & g2
-  group: name={{ item,name }}
+### create users and groups and iid with multi variable ##
+- name: create g1 & g2
+  group: name={{ item,name }} state=present
   loop:
     - { name: g1 }
     - { name: g2 }
@@ -180,11 +180,11 @@ ansible <hosts> -m command -a "<command>"
 
 - name: create users
   user:
-    user: "{{ item.user }}"
+    name: "{{ item.name }}"
     uid: "{{ item.uid }}"
     groups: "{{ item.groups }}"
     state: present
   loop:
-    - { user: testuser1,uid: 9902,groups: "g1,g2" }
-    - { user: testuser2,uid: 9903,groups: g1 }
+    - { name: testuser1,uid: 9902,groups: "g1,g2" }
+    - { name: testuser2,uid: 9903,groups: g1 }
   tags: [user_uid]
