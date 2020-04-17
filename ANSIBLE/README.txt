@@ -132,3 +132,59 @@ ansible <hosts> -m command -a "<command>"
 - name: create test user
   user: name=test comment="test" group=test
   tags: [user]
+  
+  ######### remove group and user  #########
+  - name: delete test group
+  group: name=test state=absent
+  tags: [del_group]
+
+- name: delete test user
+  user: name=test comment="test" group=test state=absent
+  tags: [del_user]
+  
+  ######## install and update with yum #########
+  - name: install epel-release
+  yum: name=epel-release state=present
+  tags: [pre_install]
+
+- name: yum update
+  yum: name=* state=latest          ### update all
+  tags: [yum_update]
+  
+  ############## FOR and LOOP in ansible #############
+  - name: yum install several packages
+  yum: name={{ item }} state=present
+  loop:
+    - vim
+    - net-tools
+    - ntp
+  tags: [install_packages]
+  
+ #### create several files ####
+ - name: create 4 files
+  file: name=/opt/{{ item }} state=touch
+  loop:
+    - file1
+    - file2 
+    - file3 
+    - file4
+  tags: [create_files]
+  
+  ### create users and groups and iid with multi variable ##
+  - name: create g1 & g2
+  group: name={{ item,name }}
+  loop:
+    - { name: g1 }
+    - { name: g2 }
+  tags: [groups]
+
+- name: create users
+  user:
+    user: "{{ item.user }}"
+    uid: "{{ item.uid }}"
+    groups: "{{ item.groups }}"
+    state: present
+  loop:
+    - { user: testuser1,uid: 9902,groups: "g1,g2" }
+    - { user: testuser2,uid: 9903,groups: g1 }
+  tags: [user_uid]
