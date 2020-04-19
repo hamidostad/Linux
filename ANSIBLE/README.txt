@@ -170,7 +170,7 @@ ansible <hosts> -m command -a "<command>"
     - file4
   tags: [create_files]
   
-### create users and groups and iid with multi variable ##
+### create users and groups and uid with multi variable ##
 - name: create g1 & g2
   group: name={{ item,name }} state=present
   loop:
@@ -188,3 +188,74 @@ ansible <hosts> -m command -a "<command>"
     - { name: testuser1,uid: 9902,groups: "g1,g2" }
     - { name: testuser2,uid: 9903,groups: g1 }
   tags: [user_uid]
+
+- name: execute file
+  shell: "{{ item }}"
+  args:
+    chdir: /opt/
+  loop:
+    - ./com1
+    - ./com2
+    - ./com3
+  tags: [comfiles]
+
+- name: delete files
+  file: path=/opt/{{ item }} state=absent
+  loop:
+    - com1
+    - com2
+    - com3
+  tags: [comfiles]
+
+- name: delete many files
+  shell: rm -rf {{ item }}
+  args: 
+    chdir: /opt/
+  loop:
+    - file*
+  tags: [dels]
+
+- name: command run
+  command: touch /opt/file
+  tags: [command]
+
+- name: create many file
+  file: path=/home/file{{ item }} state=touch
+  with_sequence: start=56 end=67 stride=2
+  tags: [create_range]
+
+- name: install mariadb
+  yum: state=latest name={{ item }}
+  loop:
+    - mariadb-server
+    - MySQL-python
+  tags: [mariadb]
+
+- name: start mariadb
+  service: name=mariadb state=restarted
+  tags: [db]
+
+
+- name: create database
+  mysql_db: name=anisadb state=present
+  tags: [dbname]
+
+- name: create user for database
+  mysql_user: name=anisauser password=password host={{ item }} login_user="root" login_password="" priv=anisadb.*:ALL state=present
+  loop:
+    - localhost
+    - 127.0.0.1
+    - ::1
+  tags: [anisauser]
+  
+  - name: flush privileges database
+  command: 'mysql -ne "{{ item }}"'
+  loop:
+    - FLUSH PRIVILEGES
+  changed_when: TRUE
+  tags: [reload]
+
+- name: download url with vars
+  get_url: url={{ paths.url }}/rpm-{{ paths.major_version }}.{{ paths.minor_version }}.tar.bz2 dest=/tmp/
+  tags: [get_url2]
+  
