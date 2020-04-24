@@ -259,3 +259,26 @@ ansible <hosts> -m command -a "<command>"
   get_url: url={{ paths.url }}/rpm-{{ paths.major_version }}.{{ paths.minor_version }}.tar.bz2 dest=/tmp/
   tags: [get_url2]
   
+####################### VARS file ################################
+- name: create group with vars file
+  group: name={{ item.name }} state=present
+  loop: '{{ user_list }}'
+  tags: [add_group]
+
+- name: crate users with vars file
+  user: name={{item.name }} comment="test" group={{item.name }}
+  loop: '{{ user_list }}'
+  tags: [add_user]
+  
+######### NOTIFY & handlers #######
+##copy config file and notif to retsart
+#task
+- name: copy
+  template: src=httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
+  notify: restart apache
+  tags: [restart_httpd]
+#handlers
+ ---
+- name: restart apache
+  service: name=httpd state=restarted
+  tags: [restart]
