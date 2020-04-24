@@ -314,7 +314,15 @@ vim roles/nginx/tasks/main.yml
 - name: copy and restart nginx
   template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
   notify: restart nginx
-  
-  ==========
   tags: [nginx]
   
+  ==============
+  
+  ## handlers file with check notify
+- name: restart mariadb
+  service: name=mariadb state=restarted
+  notify:
+    - wait for mariadb
+
+- name: wait for mariadb
+  wait_for: path='/var/log/mariadb/mariadb.log' search_regex='started' delay=20 timeout=30
