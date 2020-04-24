@@ -282,3 +282,39 @@ ansible <hosts> -m command -a "<command>"
 - name: restart apache
   service: name=httpd state=restarted
   tags: [restart]
+
+################################### META ###################################
+## install nginx with dependencies and meta file
+## phase 1
+vim roles/nginx/meta/main.yml 
+
+---
+allow_duplicates: yes
+dependencies:
+- { role: base }
+
+## phase 2
+vim roles/base/tasks/main.yml
+
+- name: install epel & net-tools
+  yum: name={{ item }} state=latest
+  loop:
+    - epel-release
+    - net-tools
+  tags: [base]
+  
+  ## phase 3
+vim roles/nginx/tasks/main.yml
+  
+  ---
+- name: install nginx
+  yum: name=nginx state=latest
+  tags: [nginx]
+
+- name: copy and restart nginx
+  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+  notify: restart nginx
+  
+  ==========
+  tags: [nginx]
+  
