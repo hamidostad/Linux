@@ -356,7 +356,7 @@ vim roles/nginx/tasks/main.yml
   notify: restart nginx
   tags: [nginxx]
 
-##################################
+
 # when with vars
 - name: if myvar=true
   shell: echo "This centainly is myvar!" > /home/true
@@ -367,3 +367,31 @@ vim roles/nginx/tasks/main.yml
   shell: echo "This centainly is not myvar!" > /home/false
   when: not myvar
   tags: [myvar]
+  
+#
+- name: varname2 is not defined!!!
+  shell: echo i={{ item }}>>/home/item
+  loop: [ 0,2,4,6,8,10 ]
+  when: item > 5
+  tags: [loopvar]
+
+## test with directory not empty and empty
+- name: list files in directory
+  command: ls /home/anisaa
+  register: contents
+  tags: [mylist]
+
+- name: check contents for emptiness
+  debug: msg="Directory is empty"
+  when: contents.stdout == ""
+  tags: [mylist]
+  
+#
+- name: list files in directory
+  command: ls -l /home
+  register: result
+  tags: [mylist2]
+
+- name: check contents for emptiness
+  debug: msg={{ result }}
+  tags: [mylist2]
