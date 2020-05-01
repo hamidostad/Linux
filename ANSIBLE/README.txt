@@ -326,3 +326,44 @@ vim roles/nginx/tasks/main.yml
 
 - name: wait for mariadb
   wait_for: path='/var/log/mariadb/mariadb.log' search_regex='started' delay=20 timeout=30
+
+############## INCLUDE & TO DO LIST#############################
+###include & to do list ##
+- name: install mariadb
+  include: mariadb.yml
+  tags: [include]
+
+- name: install apache
+  include: apache.yml
+  tags: [include]
+
+############### WHEN #####################
+# when statement
+- name: register name
+  yum: name=epel-release state=latest
+  register: centos
+  tags: [nginxx]
+
+- name: if register centis is success then install nginx
+  yum: name=nginx state=latest
+  when: centos is success
+  register: nginxinstall
+  tags: [nginxx]
+
+- name: if register nginxinstall is seccess copy mginx.conf to /etc/
+  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+  when: nginxinstall is success
+  notify: restart nginx
+  tags: [nginxx]
+
+##################################
+# when with vars
+- name: if myvar=true
+  shell: echo "This centainly is myvar!" > /home/true
+  when: myvar
+  tags: [myvar]
+
+- name: if myvar=false
+  shell: echo "This centainly is not myvar!" > /home/false
+  when: not myvar
+  tags: [myvar]
