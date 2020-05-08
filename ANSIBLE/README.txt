@@ -395,3 +395,23 @@ vim roles/nginx/tasks/main.yml
 - name: check contents for emptiness
   debug: msg={{ result }}
   tags: [mylist2]
+
+################ RESERVED VARIABLES ##################
+## find information from host
+# vim templates/test.conf.j2
+{{ inventory_hostname }}
+{{ ansible_hostname }}
+{{ ansible_devices.sda.model }}
+{{ ansible_nodename }}
+{{ inventory_hostname_short }}
+{{ ansible_playbook_python }}
+{{ inventory_dir }}
+{{ playbook_dir }}
+{{ ansible_default_ipv4.network }}
+{{ ansible_default_ipv4.address }}
+{{ ansible_default_ipv4.netmask }}
+
+- name: check IP
+  debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
+  tags: [getip]
+ 
