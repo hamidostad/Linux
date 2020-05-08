@@ -415,3 +415,18 @@ vim roles/nginx/tasks/main.yml
   debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
   tags: [getip]
  
+####### ansible galaxy ###########
+ansible-galaxy install bennojoy.nginx
+
+########## install and get hash password #######
+yum install expect  python-pip
+pip install passlib
+python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt(getpass.getpass())"
+
+- name: create test group
+  group: name=test state=present
+  tags: [grouptest]
+
+- name: create test user
+  user: name=test comment="test" group=test state=present password='$6$rounds=656000$oM3QoYTCkgvl74j1$w/CpCKOvl/T5t2u4u4aGDUV2F3XmR/qyL1BYSE6xpXjxFbcFAyb7TVW6wJWJRG.gW8U5DaN4m6qNuC73x2oKe0'
+  tags: [usertest]
