@@ -901,3 +901,7 @@ def game():
         print ("You win!")
 #Calling the function
 game()
+
+### CHANGE COLOR OF RESULT
+print('\033[31m' + 'some red text')
+print('\033[39m') # and reset to default color
