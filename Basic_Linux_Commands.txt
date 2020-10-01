@@ -1,0 +1,12 @@
+################# IP ADDRESS CONFIG ####################
+ip addr show eth1
+ip addr add 10.132.1.1/24 dev eth1
+ip addr del 10.132.1.1/24 dev eth1
+ip link set eth2 down
+
+## To see the statistics for the eth0 interface, you can use the following command:
+ip -s link ls eth0
+
+## monitor network details using the ss command
+# out ALL listening ports, both UDP and TCP:
+ss -ltun
