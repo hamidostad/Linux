@@ -7,6 +7,39 @@ ip link set eth2 down
 ## To see the statistics for the eth0 interface, you can use the following command:
 ip -s link ls eth0
 
-## monitor network details using the ss command
-# out ALL listening ports, both UDP and TCP:
+################# MONITORING ######################
+##### SS 
+## list out ALL listening ports, both UDP and TCP:
 ss -ltun
+
+##### VMSTAT
+## output to be displayed in Mega Bytes using the following command:
+vmstat –a –S M 1 999
+
+## use the following command to gather basic disk statistics:
+vmstat -d 1 99999
+
+##### IOSTAT
+iostat 1 99999
+
+## show only information for device sda, and only disk statistics by using the following options:
+iostat -d -p sda 1 9999
+
+##### SAR
+1. Install the sysstat package using the following command for a Debian-based distribution:
+$ sudo apt-get install sysstat
+We can also use the following command for a RHEL-based distribution:
+$ sudo yum install sysstat
+2. Edit the /etc/default/sysstat file with your favorite text editor and change the following value from:
+ENABLED="false"
+To:
+ENABLED="true"
+3. Restart the sysstat service using the following command:
+$ sudo service sysstat restart
+4. By default, sar stats are collected every 10 minutes. The data is collected using a simple cron job configured within /etc/cron.d/sysstat. This job can be amended to collect the data as frequently as you require.
+5. Use the following command to view basic CPU statistics, including wait times:
+sar -u
+6. Use the following command to view the available memory statistics:
+sar -r
+7. Seeing the IO stats for individual block devices can be helpful when tracking down performance issues. You can use the following command to view these statistics with sar:
+sar -b
