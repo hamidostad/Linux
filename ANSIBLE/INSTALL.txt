@@ -1,0 +1,8 @@
+# install ansible on centos
+sudo yum install epel-release
+sudo yum install ansible
+
+# install ansible on ubuntu
+sudo apt-add-repository ppa:ansible/ansible
+sudo apt update
+sudo apt install ansible

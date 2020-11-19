@@ -1,0 +1,177 @@
+## set namesever Shecan:
+nameserver 178.22.122.100
+
+## change attrib for /etc/resolve to permanent this file:
+chattr +i /etc/resolv.conf
+#and add PEERDNS=no to main network interface card config file:
+#example:
+TYPE="Ethernet"
+PROXY_METHOD="none"
+BROWSER_ONLY="no"
+BOOTPROTO="dhcp"
+PEERDNS=no
+DEFROUTE="yes"
+IPV4_FAILURE_FATAL="no"
+IPV6INIT="yes"
+IPV6_AUTOCONF="yes"
+IPV6_DEFROUTE="yes"
+IPV6_FAILURE_FATAL="no"
+IPV6_ADDR_GEN_MODE="stable-privacy"
+NAME="ens33"
+UUID="6f963b47-8823-45f9-af19-d488ee2aaf1d"
+DEVICE="ens33"
+ONBOOT="yes"
+
+##change hostname
+vim /etc/hostname
+master
+
+##change hosts file:
+vim /etc/hosts
+10.10.10.100 master
+10.10.10.101 node1
+
+##set IP address for second NIC:
+vim /etc/sysconfig/network-scripts/ifcfg-ens37
+DEVICE="ens37"
+HWADDR="00:0c:29:b3:3d:8d"
+NM_CONTROLLED="no"
+ONBOOT="yes"
+BOOTPROTO="static"
+IPADDR=10.10.10.100
+NETMASK=255.255.255.0
+
+##set selinux to disabled:
+setenforce 0
+sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
+
+#master:
+sudo firewall-cmd --permanent --add-port=6443/tcp
+sudo firewall-cmd --permanent --add-port=2379-2380/tcp
+sudo firewall-cmd --permanent --add-port=10250/tcp
+sudo firewall-cmd --permanent --add-port=10251/tcp
+sudo firewall-cmd --permanent --add-port=10252/tcp
+sudo firewall-cmd --permanent --add-port=10255/tcp
+sudo firewall-cmd --reload
+
+#worker:
+sudo firewall-cmd --permanent --add-port=10250/tcp
+sudo firewall-cmd --permanent --add-port=10251/tcp
+sudo firewall-cmd --permanent --add-port=10255/tcp
+sudo firewall-cmd --permanent --add-port=6783/tcp
+sudo firewall-cmd --permanent --add-port=30000-32767/tcp
+firewall-cmd --reload
+
+## swap off:
+swapoff -a
+vim /etc/fstab
+
+##disable ipv6 (optionally):
+vi /etc/sysctl.d/70-ipv6.conf
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+
+sysctl --load /etc/sysctl.d/70-ipv6.conf
+
+##restart the server
+init 6
+
+## updates packages
+yum --enablerepo=updates clean metadata
+yum clean all
+yum clean dbcache
+yum update
+yum install curl wget net-tools bind-utils elinks
+yum update
+
+##installing docker:
+yum install yum-utils device-mapper-persistent-data lvm2
+yum-config-manager --add-repo   https://download.docker.com/linux/centos/docker-ce.repo
+yum update
+
+## if we face to error:
+sysctl -w net.ipv4.ip_no_pmtu_disc=1
+
+yum install   containerd.io-1.2.10   docker-ce-19.03.4   docker-ce-cli-19.03.4
+
+mkdir /etc/docker
+cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+}
+EOF
+
+mkdir -p /etc/systemd/system/docker.service.d
+systemctl daemon-reload
+systemctl restart docker
+docker info
+
+##installing kubernetes:
+
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+
+yum install kubelet kubeadm kubectl --disableexcludes=kubernetes
+systemctl enable --now kubelet
+
+## exclude docker and kubernetes from updating:
+vim /etc/yum.conf
+exclude=docker-ce docker-ce-stable docker-ce-cli containerd.io kubelet kubeadm kubectl
+
+##
+modprobe br_netfilter
+
+cat <<EOF > /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+
+sysctl --system
+
+## DO ALL STEPS MENTIONED ABOVE ON ALL MASTER AND NODES SINCE THEY ARE SAME.
+
+##master
+wget https://docs.projectcalico.org/v3.11/manifests/calico.yaml
+vim calico.yaml
+
+# Auto-detect the BGP IP address.
+- name: IP
+value: "autodetect"
+- name: IP_AUTODETECTION_METHOD
+value: "interface=ens37"
+
+- name: CALICO_IPV4POOL_CIDR
+value: "192.168.100.0/24"
+
+##init the kubeadm:
+kubeadm init --pod-network-cidr=192.168.100.0/24 --apiserver-advertise-address=10.10.10.100
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+export KUBECONFIG=/etc/kubernetes/admin.conf
+
+
+kubectl apply -f calico.yaml
+
+## join other nodes to cluster:
+kubeadm join 10.10.10.100:6443 --token 2mvxad.g007mtyzo7dm9ozo \
+    --discovery-token-ca-cert-hash sha256:0b8b8c42f71aac17f4cb3f958a33fb20acca168c3f11ef95fce90b8c659b8462
+
+kubectl get nodes
+kubectl get pods --all-namespaces
