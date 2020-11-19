@@ -1,0 +1,91 @@
+logging syscron
+
+1. pick name
+conf t
+hostname sw-G-01
+
+2. management interface
+interface vlan 1
+ip address 192.168.1.1 255.255.255.0
+no shutdown
+
+3. user authentication
+enable secret Noor@123
+username admin secret Noor@123
+line vty 0 4
+login local
+
+4 . create vlans
+vlan 10
+name General
+vlan 20
+name Camera
+vlan 30
+name AP
+vlan 40
+name IPSP
+vlan 50
+name IPTV
+
+5. binding vlans and ports
+interface range fa 0/1 - 6
+switchport access vlan 10
+
+6. ssh config
+ip domain-name noor.local
+crypto key generate rsa
+line vty 0 15
+transport input ssh (all)
+username hamid password xxxxx
+vty 0 15
+login local
+
+sw layer 3
+7. trunk
+switchport trunk encap dot1q
+switchport mode trunk
+int vlan 2
+ip-helper address <server ip>
+ip routing
+
+
+SW-F0-01        10.20.160.2
+SW-F0-02        10.20.160.3
+SW-F1           10.20.160.4
+SW-F2           10.20.160.5
+SW-B1           10.20.160.6
+SW-BACKUP       10.20.160.7
+SW-CORE-01      10.20.160.1
+SW-CORE-BACKUP  10.20.160.8
+
+server01 (iLO)  10.20.160.131 (vlan11)
+server02 (iLO)  10.20.160.132 (vlan11)
+esxi01          10.20.160.141 (vlan11)
+esxi02          10.20.160.142 (vlan11)
+
+
+
+8. VPN
+crypto isakmp policy 10
+authentication pre-share
+encryption aes 128
+group 2
+lifetime 86400
+hash sha
+
+crypto isakmp key 0 cisco <remote IP address>
+
+crypto isakmp identity address
+
+crypto ipsec transform-set  ipsec esp-eas esp-sha-hmac
+
+ip access-list ipsec extended
+ip permit <source private range> 0.0.0.255 <dest private range> 0.0.0.255
+
+crypto map ipsec 10 ipsec-isakmp
+match address ipsec
+set peer <remote IP>
+set transform-set ipsec
+
+int <wan port>
+crypto man ipsec

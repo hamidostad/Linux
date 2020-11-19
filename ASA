@@ -1,0 +1,55 @@
+no nameif
+no ip address
+no security-level
+
+1. enable password
+
+2. user admin password Noor@123
+
+3.
+int e0/0
+nameif Inside
+ip address 10.20.160.10
+no sh
+description LAN
+
+int e0/0
+nameif Outside
+ip address x/x/x/x
+no sh
+description WAN
+
+4.
+route Outside 0.0.0.0 0.0.0.0 <ip WAN>
+route Inside x.x.x.x 255.255.255.0 <ip LAN>
+
+object network INSIDE-network
+subnet 10.20.0.0 255.255.0.0
+nat (inside,outside) dynamic interface
+
+5. TELNET & HTTP
+telnet Inside 10.20.160.0 255.255.255.0
+telnet timeout 2
+
+http server enable
+http 10.20.160.0 255.255.255.0 Inside
+
+6. optional dhcp
+dhcp address start ip - end ip
+dhcp dns 8.8.8.8
+dhcp option 3 <ip lan on asa>
+dhcp enable Inside
+
+7. permit icmp
+class-map inspection_default
+match default-inspectipn-traffic
+
+policy-map global_policy
+class inspection_default
+inspect icmp
+inspect http
+inspect dns
+
+service-policy global_policy global
+
+

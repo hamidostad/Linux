@@ -1,0 +1,139 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+        name: "fluentd-conf-dev-authenticatewrapper"
+        namespace: dev
+data:
+        fluent.conf: |-
+                <source>
+                  @type tail
+                  path /logs-microservices/authenticatewrapper.log
+                  pos_file /home/fluent/authenticatewrapper.log.pos
+                  refresh_interval 5s
+                  tag authenticatewrapper
+                <parse>
+                      @type csv
+                      delimiter "|"
+                       keys log_timestamp,image_name,log_level,host,ip,proxy_ip,logger_marker,app_name,trace_id,span_id,parrent_span_id,span_export,pid,thread_name,class_name,actor,action,target,auth_type,auth_clientid,username,parent,reseller,userid,user_type,token,shortcode,msisdn,dcs,subtype,response_status,response_time,status,code,item_price,items_count,credit,gw,channel,payment_type,http_method,url,userAgent,fields,msg
+                       types log_timestamp:time,item_price:integer
+                       types log_timestamp:time,image_name:string,log_level:string,host:string,ip:string,proxy_ip:string,logger_marker:string,app_name:string,trace_id:string,span_id:string,parrent_span_id:string,span_export:string,pid:string,thread_name:string,class_name:string,actor:string,action:string,target:string,auth_type:string,auth_clientid:string,username:string,parent:string,reseller:string,userid:string,user_type:string,token:string,shortcode:string,msisdn:string,dcs:integer,subtype:string,response_status:integer,response_time:integer,status:integer,code:integer,item_price:integer,items_count:integer,credit:integer,gw:string,channel:string,payment_type:string,http_method:string,url:string,userAgent:string,fields:string,msg:string
+                </parse>
+                </source>
+                <match *.**>
+                  @type elasticsearch
+                  host 10.115.69.10
+                  port 9200
+                  logstash_format true
+                </match>
+---
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-authenticatewrapper
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      run: dev-authenticatewrapper
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: dev-authenticatewrapper
+    spec:
+      serviceAccount: api-service-account
+      imagePullSecrets:
+      - name: docker-secret
+      volumes:
+        - name: "dev-authenticatewrapper-logs"
+          hostPath:
+                path: /root/k8s-data/microservices-logs
+                type: Directory
+        - name: "fluentd-conf-dev-authenticatewrapper"
+          configMap:
+                name: "fluentd-conf-dev-authenticatewrapper"
+      containers:
+      - name: fluentd-dev-authenticatewrapper
+        image: vasit-repo.mcci.local/fluentd
+        volumeMounts:
+        - name: "dev-authenticatewrapper-logs"
+          mountPath: /logs-microservices
+        - name: "fluentd-conf-dev-authenticatewrapper"
+          mountPath: /fluentd/etc/
+      - name: dev-authenticatewrapper
+        image: vasit-repo.mcci.local/authenticatewrapper:ed9190a6e1
+        volumeMounts:
+        - name: "dev-authenticatewrapper-logs"
+          mountPath: /logs
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 4032
+        env:
+          - name: TZ
+            value: "Asia/Tehran"
+          - name: APPLICATION_NAME
+            value: "auth"
+          - name: KEYCLOAK_URL
+            value: "http://dev-keycloak-iam:8080"
+          - name: KEYCLOAK_CLIENT_ID
+            value: "react-ui"
+          - name: KEYCLOAK_CLIENT_SECRET
+            value: "3f2bb8bd-7ada-46c9-9846-55ea59b9ab26"
+          - name: KEYCLOAK_TOKEN_URL
+            value: "/auth/realms/Portal/protocol/openid-connect/token"
+          - name: REDIS_URL
+            value: "10.115.69.7"
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_INDEX
+            value: "4"
+          - name: SERVER_PORT
+            value: "4032"
+          - name: CAPTCHA_SIZE
+            value: "5"
+          - name: CAPTCHA_EXPIRE_DURATION
+            value: "120"
+          - name: USER_MANAGEMENT_URL
+            value: "http://dev-usermanagement:9090"
+          - name: REQUEST_THRESHOLD
+            value: "1000"
+          - name: IP_EXPIRE_DURATION
+            value: "3600"
+          - name: SENTRY_DSN
+            value: "http://5a48796be73c483381c07df88fff6e70@10.115.69.12:9000/21"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev-authenticatewrapper
+  namespace: dev
+  labels:
+    run: dev-authenticatewrapper
+spec:
+  ports:
+  - name: port4032
+    port: 4032
+    protocol: TCP
+    targetPort: 4032
+  selector:
+    run: dev-authenticatewrapper
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    ingress.appscode.com/default-timeout: '{"connect": "15s", "server": "20s"}'
+  name: dev-authenticatewrapper-ingress
+  namespace: dev
+spec:
+  rules:
+  - host: 'dev.vas.mcci.local'
+    http:
+      paths:
+      - path: /auth/?(.*)
+        backend:
+          serviceName: dev-authenticatewrapper
+          servicePort: 4032

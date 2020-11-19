@@ -1,0 +1,904 @@
+### Strings ###
+"Hello"
+'World'
+"Its beautiful out there !"
+print("Hello")
+print("World")
+print("Its beautiful out there !")
+
+# 1) Splitting of Strings
+print("Hi there, Welcome to Python !")
+print("Hi there, \nWelcome to Python !")
+print("1234")
+print("\t1\t2\t3\t4")
+print("Hello \tWorld")
+print("Hello World")
+a="Nice Work"
+print(a)
+len(a)
+b="Mark"
+len(b)
+
+# Indexing/Slicing
+
+name="Sherlock Holmes"
+name
+len(name)
+name[0]
+name[2]
+name[13]
+name[12]
+name[-1]
+name[-6]
+name[9:]
+name[11:]
+name[0:3]
+name[0:4] # Upper bound Excluded
+name[4:7]
+name
+name[::] # Step Size
+name[::2]
+name[::3]
+# [Start:Stop:Step Size]
+name[0:5:2]
+name[0:5:3]
+name[::-1]
+
+# String Properties and Methods
+name="Sam"
+name
+name[0]="P" # Strings are Immutable !
+a=name[1:]
+a
+print("P"+a)
+x="Hello Dear,"
+y="Let us go for a walk"
+print(x+y)
+print(x+" "+y)
+my_string="b"
+print(my_string)
+print(my_string*10)
+2+3
+"2"+"3"
+x="Thank You"
+print(x)
+x.lower()
+x.upper()
+x.split()
+x.split("i")
+x.split("h")
+
+# String Formatting
+
+# 1) .format method
+print("My name is {}".format("Vijay"))
+print("Colors are {} {} {}".format("Red","Green","Blue"))
+print("Colors are {0} {1} {2}".format("Red","Green","Blue"))
+print("Colors are {2} {0} {1}".format("Red","Green","Blue"))
+print("Colors are {0} {0} {0}".format("Red","Green","Blue"))
+
+print("Colors are {r} {g} {b}".format(r="Red",g="Green",b="Blue"))
+print("Colors are {r} {r} {r}".format(r="Red",g="Green",b="Blue"))
+
+# float formatting method (.format method)
+# "{value:width.precisionf}"
+pie=22/7
+pie
+print("value is {} ".format(pie))
+print("value is {p} ".format(p=pie))
+print("value is {p:1.2f} ".format(p=pie))
+print("value is {p:10.4f} ".format(p=pie))
+
+# 2) f-strings method (formatted string literals)
+# Introduced in Python 3.6 and it is very new
+name="Tom"
+print("My name is {} ".format(name))
+print(f"My name is {name} ")
+
+name="Mark"
+age=7
+print("{} is {} years old".format(name,age))
+print(f"{name} is {age} years old")
+
+### Numbers ###
+
+5+3
+7-2
+5*4
+16/4
+a=10
+b=5
+print(a)
+print(b)
+print(a+b)
+print(a-b)
+print(a*b)
+print(a/b)
+
+# Mod Operator
+7/5
+7%5
+15%2
+2**3
+3**2
+2+10*10+5
+
+# Division and Multiplication has highest priority
+# These operators work from left two right
+(5+((20/4)*2)-7)
+
+### Lists ###
+
+my_list=["Hello",100,27.42]
+print(my_list)
+len(my_list)
+
+# 1) concatenation
+list2=["one","two","three"]
+new_list=my_list+list2
+print(new_list)
+
+# 2) Define an empty list
+empty_list=[]
+print(empty_list)
+type(empty_list)
+
+# 3) Indexing/Slicing
+students=["Roberts","Chris","Katarina","Scarlett"]
+students
+students[0]
+students[2]
+students[-1]
+students[0:2]
+
+# 4) Editing lists
+fruits=["Apple","Banana","Cherry","Mango","Grape"]
+fruits
+# Replace values
+fruits[0]="Orange"
+fruits
+# Add values
+fruits.append("Pumpkin")
+fruits
+# Remove values
+fruits.remove("Grape")
+fruits
+
+number=["one","two","three","four","five"]
+number
+number.pop()
+number
+number.pop(0)
+number
+
+# 5) Add one list to another
+names=["A","B","C","D"]
+names
+age=[1,2,3,4]
+age
+names.extend(age)
+names
+
+# 6) build-in functions with the lists
+l=[2,4,6,8,1,3,5,7,9]
+l
+l.sort()
+l
+len(l)
+max(l)
+min(l)
+
+# 1) concatenation
+# 2) Define an empty list
+# 3) Indexing/Slicing
+# 4) Editing the lists
+# 5) Add one list to another
+# 6) build-in functions with the lists
+
+### Dictionaries ###
+
+# 1) Define a Dictionary
+my_dict={"key1":"value1","key2":"value2"}
+my_dict
+my_dict["key1"]
+fruits={"Apple":2,"Banana":1.75,"Cherry":3}
+fruits
+fruits["Banana"]
+
+# 2) Dictionaries with all data types
+d={"key1":147,"key2":[15,25,35],"key3":{"Apple":3}}
+d
+d["key2"]
+d["key2"][1]
+d["key3"]
+d["key3"]["Apple"]
+my_dict={"key1":["a","b","c","d"]}
+my_dict
+my_dict["key1"]
+my_dict["key1"][2]
+letter=my_dict["key1"][2]
+letter
+letter.upper()
+letter.lower()
+
+# 3) Editing Dictionary
+d={"key1":100,"key2":200,"key3":300}
+d
+d["key4"]=400
+d
+d["key1"]="New Value"
+d
+
+# 4) Keys,Values and Items 
+d={"key1":100,"key2":200,"key3":300}
+d
+d.keys()
+d.values()
+d.items()
+
+# 1) Define a Dictionary
+# 2) Dictionaries with all data types
+# 3) Editing Dictionary
+# 4) Keys,Values and Items
+
+### Tuples ###
+
+# 1) Define a Tuple
+t=(1,2,3,4,5)
+print(t)
+type(t)
+len(t)
+my_tuple=("Hello",100,27.99)
+my_tuple
+type(my_tuple)
+
+# 2) Indexing/Slicing
+fruits=("Apple","Banana","Orange","Apple")
+fruits
+fruits[0]
+fruits[2]
+fruits[-1]
+fruits[-2]
+fruits[0:2]
+fruits.count("Apple")
+
+# 3) Difference between List and Tuple
+l=["a","b","c","d","e"]
+print(l)
+type(l)
+t=("a","b","c","d","e")
+print(t)
+type(t)
+l[0]="New Element"
+l
+t[0]="New Element"
+
+
+# 1) Define a Tuple
+# 2) Indexing/Slicing
+# 3) Difference between List and Tuple
+
+### Sets ###
+
+my_set=set()
+my_set
+my_set.add("Hello")
+my_set
+my_set.add(24)
+my_set
+my_set.add("Hello")
+my_set
+l=[1,1,1,2,2,3,4,5,"Hello","Hello"]
+l
+set(l)
+
+### Booleans ###
+
+True
+true
+False
+false
+type(True)
+10>7
+5>9
+3==5
+
+### File Handling Basics ###
+
+# Write text file
+%%writefile test.txt
+Hello There,
+Line 1
+Line 2
+
+# Read text file
+my_file=open("test.txt")
+my_file.read() # Returns Giant String
+my_file.read()
+my_file.seek(0)
+my_file.read()
+my_file.seek(0)
+my_text=my_file.read()
+my_text
+my_file.seek(0)
+my_file.readlines()
+my_file.close()
+pwd
+
+my_file=open("C:\\Users\\vijay\\Desktop\\Python HD\\Python 3\\Section 5\\test.txt")
+my_file.read() # Returns Giant String
+"C:/Users/vijay/Desktop/Python HD/Python 3/Section 5"
+
+# Read, Write and Append Modes !
+%%writefile test2.txt
+Iron Man
+Hulk
+Super Man
+Spyder Man
+
+with open("test2.txt",mode="r") as f:
+    print(f.read())
+with open("test2.txt",mode="a") as f:
+    f.write("\nThanos")
+with open("test2.txt",mode="r") as f:
+    print(f.read())
+with open("test3.txt",mode="w") as f:
+    f.write("It is based on Marvel Comics")
+with open("test3.txt",mode="r") as f:
+    print(f.read())
+
+ ### Built in functions ###
+
+dir(__builtins__)
+pow(2,3)
+pow(3,4)
+number=(10,20,30,40,50)
+string="Hello"
+type(string)
+type(number)
+sorted(number)
+min(number)
+max(number)
+
+### If,elif,Else Statements ###
+
+if 5>3:
+    print("Right")
+    
+if 5<3:
+    print("Right")
+else:
+    print("Wrong")
+    
+a=40
+b=50
+if a>b:
+    print("a is greater than b")
+else:
+    print("a is less than b")
+    
+drink="Tea"
+if drink=="Coffee":
+    print("Humanity runs on Coffee")
+elif drink=="Water":
+    print("Water is the soul of Earth")
+elif drink=="Coke":
+    print("Coke is new fuel for Programmer")
+else:
+    print("You are free to select your Drink")
+
+### For Loop ###
+
+# Define a for loop
+my_list=[1,2,3,4,5,6,7,8,9,10]
+for num in my_list:
+    print(num)
+for cherry in my_list:
+    print(cherry)
+for cherry in my_list:
+    print("Hello")
+for num in my_list:
+    if num%2==0:
+        print(num)
+for num in my_list:
+    if num%2!=0:
+        print(num)
+for num in my_list:
+    if num%2==0:
+        print("Even number {} ".format(num))
+    else:
+        print("Odd number {} ".format(num))
+
+# For loop with lists
+my_list=[1,2,3,4,5]
+list_sum=0
+for num in my_list:
+    list_sum=list_sum+num
+    print(list_sum)
+for num in my_list:
+    list_sum=list_sum+num
+print(list_sum)
+
+# For loop with strings
+my_string="Hello World"
+for letters in my_string:
+    print(letters)
+for letters in "Hello World":
+    print(letters)
+for letters in my_string:
+    print("Python")
+for _ in "Hello World":
+    print("Python")
+
+# For loop with tuples
+my_tuple=(1,2,3,4,5)
+for i in my_tuple:
+    print(i)
+number=[(1,2),(3,4),(5,6),(7,8)]
+type(number)
+len(number)
+for items in number:
+    print(items)
+for a,b in number:
+    print(a,b)
+for a,b in number:
+    print(a)
+for a,b in number:
+    print(a)
+    print(b)
+    
+my_list=[(1,2,3),(4,5,6),(7,8,9)]
+for a,b,c in my_list:
+    print(a,b,c)
+for a,b,c in my_list:
+    print(a)
+    print(b)
+    print(c)
+
+# For loop with dictionaries
+my_dict={"k1":1,"k2":2,"k3":3}
+for i in my_dict:
+    print(i)
+for i in my_dict.items():
+    print(i)
+for i in my_dict.keys():
+    print(i)
+for i in my_dict.values():
+    print(i)
+for a,b in my_dict.items():
+    print(a)
+
+### While Loop ###
+
+a=0
+while a<5:
+    print(a)
+    a=a+1
+    
+a=0
+while a<5:
+    print(a)
+    a+=1
+else:
+    print("a is not less than 5")
+    
+a=10
+while a<5:
+    print(a)
+    a+=1
+else:
+    print("a is not less than 5")
+    
+# pass, continue, break
+
+# pass
+l=[1,2,3,4]
+for items in l:
+    # will do it letter
+    pass
+print("I will work letter")
+
+# continue
+my_string="Hello World"
+for letters in my_string:
+    if letters=="r":
+        continue
+    print(letters)
+
+# break
+my_string="Hello World"
+for letters in my_string:
+    if letters=="r":
+        break
+    print(letters)
+
+a=0
+while a<5:
+    if a==2:
+        break
+    print(a)
+
+### Commonly used Functions in Python ###
+
+# 1) range function
+for num in range(10):
+    print(num)
+for num in range(5,10):
+    print(num)
+for num in range(0,11,2):
+    print(num)
+my_list=[1,2,3,4,5,6,7,8,9,10]
+range(10)
+list(range(10))
+list(range(0,11))
+a=list(range(0,11))
+print(a)
+
+# 2) enumerate function
+word="Batman"
+for items in word:
+    print(items)
+for a,b in enumerate(word):
+    print(a)
+    print(b)
+
+# 3) zip function
+list1=[1,2,3,4,5]
+list2=["a","b","c","d","e"]
+list3=[100,200,300]
+zip(list1,list2)
+for items in zip(list1,list2):
+    print(items)
+for a,b in zip(list1,list2):
+    print(b)
+for items in zip(list1,list2,list3):
+    print(items)
+
+# 4) in function
+"a" in [1,2,3]
+"a" in [1,2,3,"a"]
+"S" in "school"
+d={"k1":100,"k2":200}
+"k1" in d
+100 in d.values()
+
+# 5) random library
+import random
+from random import shuffle
+my_list=[1,2,3,4,5,6,7,8,9,10]
+shuffle(my_list)
+my_list
+b=shuffle(my_list)
+b
+type(b)
+from random import randint
+randint(0,100)
+c=randint(0,100)
+c
+
+# 6) input function
+result=input("Enter a number ")
+result
+type(result)
+int(result)
+float(result)
+result=int(input("Enter a number"))
+type(result)
+result=input("What is your name? ")
+print("Hello {}".format(result))
+
+### List Comprehensions in Python ###
+my_string="Hello"
+for letters in my_string:
+    print(letters)
+
+my_list=[]
+for letters in my_string:
+    my_list.append(letters)
+my_list
+
+my_list=[letters for letters in my_string]
+my_list
+my_list=[x for x in my_string]
+my_list
+new_list=[x for x in "Python"]
+new_list
+my_list=[num for num in range(1,10)]
+my_list
+my_list=[num**2 for num in range(1,10)]
+my_list
+my_list=[x for x in range(1,10) if x%2==0]
+my_list
+
+### Functions Part ###
+
+# Define a function ?
+def name_function():
+    print("Hello")
+name_function()
+help(name_function)
+
+def my_function():
+    """
+    Created by : Vijay
+    Input : No
+    Output : Hello
+    """
+    print("Hello")
+my_function()
+help(my_function)
+
+# Add argument in the function
+def greeting(name="There"):
+    return("Good Morning "+name)
+greeting("Vijay")
+greeting()
+result=greeting()
+result
+type(result)
+
+# Function to add numbers
+def add(a,b):
+    return a+b
+add(10,15)
+
+# Function to print even numbers
+def even_number(l):
+    """
+    It is a function to print even numbers
+    input : list
+    output : A list with even numbers
+    """
+    enum=[]
+    for number in l:
+        if number%2==0:
+            enum.append(number)
+    return(enum)
+even_number([1,2,3,4,5,6,7,8,9,10])
+help(even_number)
+
+# BMI Calculator
+def bmi_cal(name,hight_m,waight_kg):
+    bmi=waight_kg/(hight_m**2)
+    print("BMI : ")
+    print(bmi)
+    if bmi<25:
+        return name+" is not overwaight"
+    else:
+        return name+" is overwaight"
+bmi_cal("John",1.72,70)
+
+### *args and **kwargs ###
+
+# *args
+def my_function(a,b,c=0,d=0):
+    return sum((a,b,c,d))
+my_function(10,20,30,40)
+
+def my_function(*qwe):
+    return sum(qwe)
+my_function(10,20,5)
+
+def new_function(*args):
+    for items in args:
+        print(items)
+new_function(1,2,3,4,5)
+
+# **kwargs
+def my_function(**kwargs):
+    print(kwargs)
+    if "flower" in kwargs:
+        print("We have {} for you ".format(kwargs["flower"]))
+    else:
+        print("No flowers for you")
+my_function(flower="Rose",color="Red")
+
+# *args and **kwargs together
+def my_function(*args,**kwargs):
+    print(args)
+    print(kwargs)
+    print("I would like to have {} {} ".format(args[0],kwargs["fruit"]))
+my_function(1,2,3,4,fruit="Mango",flower="Lily")
+
+
+
+==========================================================
+
+print("hi")
+
+# VARIABLES
+age=31
+name="Hamid"
+len(name)				# answer is 5
+name[1:3]				# am
+name[::2]				# Hmd
+
+# LIST
+list1=[23, 75, "Kavian" ,"Rafi"]
+list1.insert(<index.no>, "Mahdi")
+list1.remove("Rafi")
+list1.clear()						
+list1.sort()
+list1.reverse()
+list1.extend(list2)			# merge 2 list
+list3=list1.copy()
+
+list2d=[
+	[21,22,23],
+	[31,32,37]
+]
+print(list2d[0][2])		#Answer is 23
+
+# tuples is similar to list bud secure (No change)
+
+# Dictionaries
+mount={
+	"J": "January"
+	"M": "May"
+}
+
+# IF statement
+if num == 10:
+	print("equal 10")
+else:
+	print ("not 10")
+
+# LOOP
+for <indexname> in <listname>
+	print(indexname)
+
+# ARRAY
+import array
+arr=array.array('i',[23,45])
+print(arr[1])			# answer is 45
+
+# FUNCTION
+name="hamid"
+name2="shahin"
+print(name.lower())
+print(name.upper())
+print(name.replace(name,name2))		# replace name with name2
+
+def myFunction():
+	print("user function")
+
+myFunction()
+
+# INPUT STATEMENT
+name=input("Enter the name: ")
+print(name)
+
+# MODULE
+import <filename>
+<filename>.message()		# show content of file
+
+# TRY & EXCEPT BLOCK
+try:
+	num1=0
+	num2=5
+	formula=num2/num1
+except ValueError:			#ValueError show type of error
+	print("invalid values")
+
+# OPERATORS
++
+-
+/
+*
+**
+
+# RELATIONAL OPERATION
+<
+>
+<=
+>=
+==
+!=
+
+# LOGICAL OPERATION
+and
+or
+
+# READ & WRITE EXTERNAL FILE
+f=open("<filename>.py","w")
+f.write=("write this string")		# add this line to file
+f.close()
+
+# DELETE FILE
+import os
+os.remove("<filename>")
+
+
+=============================================================
+###Projects:###
+
+1.
+# Script for shutdown & restart system
+import os
+def offRestart():
+	peirn("s for shutdown\n2 for restart\nEnter any key for exit: ")
+	choice=input("enter your choice: ")
+
+	if choice=="1":
+		os.system("shutdown /s")
+	elif choice=="2":
+		os.system("shutdown /r")
+	else:
+		exit()
+
+offRestart()
+
+2.
+#Calculator
+def calculator():
+    print("------------------")
+    print("=== Calculator ===")
+    print("------------------")
+    print("1 For Addition \n2 For Subtraction \n3 For Multiplication \n4 For Division \n5 For Modulation")
+
+    #Deleclaring variable for operation
+    operation=input("Enter your Choice :")
+
+    #Checking operation
+    if operation!="1" and operation!="2" and operation!="3" and operation!="4" and operation!="5":
+        print("Invalid Choice")
+        exit()
+
+    #Declaring variables for operations like addition subtraction etc
+    num1=input("Enter your first number :")
+    num2=input("Enter your second number :")
+
+    convert1=int(num1)
+    convert2=int(num2)
+
+    #Checking and performing operations
+    if operation=="1":
+        formula=convert1+convert2
+        print ("The result is :"+str(formula))
+    elif operation=="2":
+        formula = convert1 - convert2
+        print ("The result is :" + str(formula))
+    elif operation=="3":
+        formula = convert1 * convert2
+        print ("The result is :" + str(formula))
+    elif operation=="4":
+        formula = convert1 / convert2
+        print ("The result is :" + str(formula))
+    elif operation=="5":
+        formula = convert1 % convert2
+        print ("The result is :" + str(formula))
+
+
+#Calling the function
+calculator()
+
+3.
+# Guessing game
+def game():
+    print("---------------------")
+    print("=== Guessing Game ===")
+    print("---------------------")
+
+    #Declearing Variables
+    G_count=0
+    G_limit=5
+    Out_of_g=False
+    Guess=""
+    Sec_word="Khan"
+
+    #While loop
+    while Guess!=Sec_word and not(Out_of_g):
+        if G_count<G_limit:
+            Guess=input("Enter the Guess :")
+            G_count+=1
+        else:
+            Out_of_g=True
+
+    #If statement for Result
+    if Out_of_g:
+        print ("You lose the game!")
+    else:
+        print ("You win!")
+#Calling the function
+game()
+

@@ -1,0 +1,7 @@
+config iLO
+
+1. connect LAN cable to iLO port back of server
+2. press f10
+3. perform maintenance
+4. ilo configuration
+5. netrwork setting then ipv4
