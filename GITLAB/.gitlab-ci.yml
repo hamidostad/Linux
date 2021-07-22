@@ -1,0 +1,41 @@
+stages:
+  - maven
+  - build
+  - push
+  - deploy
+
+maven:
+  stage: maven
+  script:
+  - mvn clean compile package
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - target/rest-service-complete-0.0.1-SNAPSHOT.jar
+
+build-code:
+  stage: build
+  script:
+    - docker build -t 192.168.233.100:5000/test:$CI_COMMIT_SHORT_SHA  .
+
+
+
+push-to-repository:
+  stage: push
+  script:
+    - docker push 192.168.233.100:5000/test:$CI_COMMIT_SHORT_SHA
+
+
+deploy:
+  stage: deploy
+  script:
+#    - if (docker ps -a | Select-String -Pattern test) {docker rm -f test} else { Write-Host ("OK") }
+#    - docker login --username $NEXUS_USER --password $NEXUS_PASS nexus.ht.local:1111
+#    - docker build . -t nexus.ht.local:1111/eureka-server:$CI_COMMIT_SHORT_SHA
+#    - docker run --name test -d -p 8081:8080 test:$CI_COMMIT_SHORT_SHA
+    - kubectl set image deployment/test test=192.168.233.100:5000/test:$CI_COMMIT_SHORT_SHA
+  tags:
+    - master
+  only:
+    - main
+  when: manual
