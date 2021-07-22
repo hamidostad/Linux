@@ -1,0 +1,32 @@
+### INSTALL GITLAB
+
+sudo yum install -y curl policycoreutils-python openssh-server perl
+# Enable OpenSSH server daemon if not enabled: sudo systemctl status sshd
+sudo systemctl enable sshd
+sudo systemctl start sshd
+# Check if opening the firewall is needed with: sudo systemctl status firewalld
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo systemctl reload firewalld
+
+curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
+
+sudo EXTERNAL_URL="https://gitlab.example.com" yum install -y gitlab-ee
+
+
+### INSTALL GITLAB-RUNNER on gitlan server and master1 ###
+
+curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh" | sudo bash
+
+sudo yum install gitlab-runner -y
+
+systemctl start gitlab-runner
+systemctl enable gitlab-runner
+
+usermod -aG docker gitlab-runner
+
+
+### INSTALL lastest git (2.x) on gitlab and master1 ###
+
+sudo yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm
+sudo yum install git
