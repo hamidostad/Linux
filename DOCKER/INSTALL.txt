@@ -49,3 +49,20 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt update
 apt-cache policy docker-ce
 sudo apt install docker-ce
+
+
+=============================================================================================
+
+### Install docker on windows 2016 ###
+
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+Register-PSRepository -Default
+
+Install-PackageProvider containerimage -Force
+
+Install-Module -Name DockerMsftProvider -Repository PSGallery -Force
+
+Install-Package -Name docker -ProviderName DockerMsftProvider
+
+Restart-Computer -Force
